@@ -1,0 +1,8 @@
+res://default_env.tres
+res://bullets/knive.tscn
+res://player/Player.gd
+res://world/World.tscn
+res://player/Player.tscn
+res://enemies/Enemy.tscn
+res://Gun/Gun.tscn
+res://player/Gun.gd

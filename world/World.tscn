@@ -1,0 +1,48 @@
+[gd_scene load_steps=8 format=3 uid="uid://bmoudaej1uh03"]
+
+[ext_resource type="PackedScene" path="res://camera/Camera2D.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://eygwnd6wwxv3" path="res://player/Player.tscn" id="3"]
+[ext_resource type="Texture2D" uid="uid://05krbcxe7xp8" path="res://back/Back.jpg" id="4"]
+[ext_resource type="PackedScene" path="res://spawner.tscn" id="5"]
+[ext_resource type="Script" path="res://world/World.gd" id="6"]
+[ext_resource type="Script" path="res://world/Label.gd" id="7"]
+[ext_resource type="Texture2D" uid="uid://bqlorlfjqp8s" path="res://icon.png" id="7_v3kjp"]
+
+[node name="World" type="Node"]
+script = ExtResource("6")
+
+[node name="Camera2D" parent="." instance=ExtResource("2")]
+position = Vector2(0, 0)
+process_callback = 0
+position_smoothing_speed = 0.0
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(514, 300)
+texture = ExtResource("4")
+
+[node name="Player" parent="." instance=ExtResource("3")]
+
+[node name="spawner" parent="." instance=ExtResource("5")]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Icon" type="Sprite2D" parent="UI"]
+position = Vector2(532, 392)
+scale = Vector2(0.375, 0.25)
+texture = ExtResource("7_v3kjp")
+
+[node name="Interface" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="UI/Interface"]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 20.0
+offset_right = 62.0
+offset_bottom = 34.0
+script = ExtResource("7")
