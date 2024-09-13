@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://du8cuwv0sxp06"]
+
+[ext_resource type="Script" path="res://bullets/Lightning.gd" id="1_jla1a"]
+[ext_resource type="Texture2D" uid="uid://d04c3wgnear6d" path="res://bullets/sprites/Lighting.png" id="2_m0i1u"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_5oarv"]
+
+[node name="Lightning" type="Area2D"]
+script = ExtResource("1_jla1a")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(-1, -2)
+scale = Vector2(1.01038, 1.01574)
+texture = ExtResource("2_m0i1u")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_5oarv")
+
+[node name="Line2D" type="Line2D" parent="."]
+
+[node name="Timer" type="Timer" parent="."]

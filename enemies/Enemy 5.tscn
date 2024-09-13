@@ -1,0 +1,127 @@
+[gd_scene load_steps=12 format=3 uid="uid://cvt70qurwcnnt"]
+
+[ext_resource type="Script" path="res://enemies/Enemy 5.gd" id="1_w8s3a"]
+[ext_resource type="Shader" path="res://enemies/Enemy_dmg.gdshader" id="2_3v4kq"]
+[ext_resource type="Texture2D" uid="uid://ns5bkloqqay6" path="res://enemies/monster12.png" id="3_4hljf"]
+[ext_resource type="Script" path="res://enemies/DeathParticles.gd" id="4_xbt52"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ccl1a"]
+radius = 48.0
+height = 272.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yadn3"]
+resource_local_to_scene = true
+shader = ExtResource("2_3v4kq")
+shader_parameter/hit_opacity = 0.0
+
+[sub_resource type="Animation" id="Animation_4hr07"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/hit_opacity")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_enyo6"]
+resource_name = "takeDmg"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/hit_opacity")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_qck1i"]
+_data = {
+"RESET": SubResource("Animation_4hr07"),
+"takeDmg": SubResource("Animation_enyo6")
+}
+
+[sub_resource type="Gradient" id="Gradient_np47y"]
+offsets = PackedFloat32Array(0, 0.728477, 1)
+colors = PackedColorArray(1, 0, 0, 1, 1, 0, 0.0156863, 0.835294, 1, 1, 1, 0.188235)
+
+[sub_resource type="CapsuleShape2D" id="1"]
+radius = 24.0
+height = 136.0
+
+[node name="Enemy" type="CharacterBody2D"]
+z_index = 1
+script = ExtResource("1_w8s3a")
+
+[node name="Area2D" type="Area2D" parent="." groups=["enemy"]]
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CapsuleShape2D_ccl1a")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+material = SubResource("ShaderMaterial_yadn3")
+position = Vector2(32, 0)
+scale = Vector2(0.35, 0.35)
+texture = ExtResource("3_4hljf")
+
+[node name="AnimPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_qck1i")
+}
+autoplay = "RESET"
+
+[node name="DeathParticles" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 100
+lifetime = 2.0
+one_shot = true
+explosiveness = 1.0
+randomness = 1.0
+local_coords = true
+emission_shape = 1
+emission_sphere_radius = 5.0
+direction = Vector2(1, 1)
+spread = 180.0
+gravity = Vector2(0, 100)
+initial_velocity_min = 100.0
+initial_velocity_max = 200.0
+linear_accel_max = 100.0
+angle_max = 360.0
+scale_amount_min = 3.0
+scale_amount_max = 3.0
+color = Color(0.65098, 0, 0, 1)
+color_initial_ramp = SubResource("Gradient_np47y")
+script = ExtResource("4_xbt52")
+
+[node name="Timer" type="Timer" parent="DeathParticles"]
+one_shot = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+scale = Vector2(2, 2)
+shape = SubResource("1")
+
+[node name="DamageTimer" type="Timer" parent="."]
+wait_time = 0.15
+
+[node name="SlowTimer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="Area2D" to="." method="_on_area_2d_body_exited"]
+[connection signal="timeout" from="DeathParticles/Timer" to="." method="_on_timer_timeout"]
+[connection signal="timeout" from="DamageTimer" to="." method="_on_damage_timer_timeout"]
+[connection signal="timeout" from="SlowTimer" to="." method="_on_slow_timer_timeout"]

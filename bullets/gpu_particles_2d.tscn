@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" uid="uid://071opyns00u" path="res://bullets/FireTrail.tscn" id="1_b5oli"]
+
+[node name="GPUParticles2D" type="GPUParticles2D"]
+emitting = false
+one_shot = true
+
+[node name="Marker2D" type="Marker2D" parent="."]
+
+[node name="CPUParticles2D" parent="." instance=ExtResource("1_b5oli")]

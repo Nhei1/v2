@@ -1,0 +1,38 @@
+[gd_scene load_steps=6 format=3 uid="uid://d1qbfv2q2dnst"]
+
+[ext_resource type="Script" path="res://test/object_a.gd" id="1_scl1c"]
+[ext_resource type="Texture2D" uid="uid://bqlorlfjqp8s" path="res://icon.png" id="2_lkh0b"]
+[ext_resource type="Script" path="res://test/object_b.gd" id="3_766ib"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5c0vp"]
+size = Vector2(64, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gxypr"]
+size = Vector2(64, 64)
+
+[node name="Scene" type="Node2D"]
+
+[node name="ObjectA" type="CharacterBody2D" parent="."]
+position = Vector2(160, 352)
+script = ExtResource("1_scl1c")
+
+[node name="Sprite2D" type="Sprite2D" parent="ObjectA"]
+texture = ExtResource("2_lkh0b")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ObjectA"]
+shape = SubResource("RectangleShape2D_5c0vp")
+
+[node name="ObjectB" type="CharacterBody2D" parent="."]
+position = Vector2(1760, 352)
+script = ExtResource("3_766ib")
+
+[node name="Sprite2D" type="Sprite2D" parent="ObjectB"]
+texture = ExtResource("2_lkh0b")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ObjectB"]
+shape = SubResource("RectangleShape2D_gxypr")
+
+[node name="Timer" type="Timer" parent="."]
+autostart = true
+
+[connection signal="timeout" from="Timer" to="ObjectA" method="_on_timer_timeout"]

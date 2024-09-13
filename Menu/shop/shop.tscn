@@ -1,0 +1,111 @@
+[gd_scene load_steps=9 format=3 uid="uid://bd7pdjgrq467i"]
+
+[ext_resource type="Texture2D" uid="uid://dgreqvawqf1dw" path="res://Menu/cityMenu/0-original.png" id="1_ow050"]
+[ext_resource type="Script" path="res://Menu/shop/shop.gd" id="1_xkha6"]
+[ext_resource type="Shader" path="res://world/World.gdshader" id="2_rwuar"]
+[ext_resource type="FontFile" uid="uid://ddwxwtqogbx83" path="res://font/Zaychik-Regular.ttf" id="3_itlj2"]
+[ext_resource type="PackedScene" uid="uid://dnodrmxgg4ryu" path="res://Menu/shop/control.tscn" id="4_efxye"]
+[ext_resource type="PackedScene" uid="uid://6q0axmn61oae" path="res://gold1.tscn" id="5_507k7"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_s21i1"]
+shader = ExtResource("2_rwuar")
+shader_parameter/projector_power = 0.047
+shader_parameter/vignette_param = 1.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_hcetr"]
+font = ExtResource("3_itlj2")
+font_size = 120
+font_color = Color(0.917647, 0.792157, 0.458824, 1)
+outline_size = 15
+outline_color = Color(0, 0, 0, 1)
+
+[node name="Shop" type="Control"]
+custom_minimum_size = Vector2(250, 300)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xkha6")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("1_ow050")
+expand_mode = 3
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_s21i1")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TextureRect2" parent="." instance=ExtResource("5_507k7")]
+layout_mode = 1
+offset_left = -480.0
+offset_top = 48.0
+offset_right = 122.0
+offset_bottom = 317.0
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 50
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+text = "Purchasing upgrades"
+label_settings = SubResource("LabelSettings_hcetr")
+vertical_alignment = 1
+
+[node name="Exit" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(125, 125)
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Exit"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 2
+offset_left = 50.0
+offset_top = 168.0
+offset_right = 864.0
+offset_bottom = 808.0
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="GridContainer" type="GridContainer" parent="ScrollContainer/HBoxContainer2"]
+layout_mode = 2
+theme_override_constants/h_separation = 30
+theme_override_constants/v_separation = 30
+columns = 3
+
+[node name="Control" parent="." instance=ExtResource("4_efxye")]
+layout_mode = 1
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/Exit" to="." method="_on_exit_pressed"]

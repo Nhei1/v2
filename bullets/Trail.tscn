@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://bjpwofljvnmex"]
+
+[ext_resource type="Shader" path="res://bullets/knive.gdshader" id="1_wqpov"]
+[ext_resource type="Texture2D" uid="uid://dswbd45moda6l" path="res://1663950806_57-top-fon-com-p-serii-shum-fon-foto-116.png" id="2_q5pqo"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1rbj3"]
+shader = ExtResource("1_wqpov")
+shader_parameter/gradientRemap = Vector4(-0.208, 3.679, 0.023, 0.035)
+shader_parameter/beamRemap = Vector4(3.413, -2.615, -1.353, 2.936)
+shader_parameter/color1 = Color(0, 0.894118, 0, 0)
+shader_parameter/color2 = Color(1, 1, 1, 1)
+shader_parameter/scale = Vector3(1, 35, -0.051)
+shader_parameter/threshold = 0.973
+shader_parameter/offset = 1.901
+shader_parameter/noise = ExtResource("2_q5pqo")
+
+[sub_resource type="QuadMesh" id="QuadMesh_ea64n"]
+lightmap_size_hint = Vector2i(7, 7)
+
+[node name="MeshInstance2D" type="MeshInstance2D"]
+modulate = Color(1, 1, 1, 0.470588)
+self_modulate = Color(1, 1, 1, 0.670588)
+material = SubResource("ShaderMaterial_1rbj3")
+position = Vector2(-1.42109e-14, -1.42109e-14)
+scale = Vector2(6, 6)
+mesh = SubResource("QuadMesh_ea64n")

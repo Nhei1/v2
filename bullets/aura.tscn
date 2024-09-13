@@ -1,0 +1,38 @@
+[gd_scene load_steps=6 format=3 uid="uid://c4x74gsguu2wp"]
+
+[ext_resource type="Script" path="res://bullets/Aura.gd" id="1_1buwj"]
+[ext_resource type="Shader" path="res://bullets/aura.gdshader" id="2_uxdi2"]
+[ext_resource type="Texture2D" uid="uid://c247e3orbjxu7" path="res://bullets/sprites/aura2.png" id="3_vjjtr"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hdjt6"]
+radius = 184.043
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6skpr"]
+shader = ExtResource("2_uxdi2")
+shader_parameter/glow_color = Color(1, 1, 1, 1)
+shader_parameter/glow_intensity = 0.148
+shader_parameter/blur_radius = 0.015
+shader_parameter/alpha_threshold = 0.59
+shader_parameter/distortion_amount = 0.004
+shader_parameter/time_scale = 12.0
+
+[node name="Aura" type="Area2D" groups=["Aura", "noArmor"]]
+z_index = 2
+script = ExtResource("1_1buwj")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-3, 0)
+shape = SubResource("CircleShape2D_hdjt6")
+disabled = true
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+visible = false
+material = SubResource("ShaderMaterial_6skpr")
+position = Vector2(-4, -10)
+texture = ExtResource("3_vjjtr")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.15
+autostart = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

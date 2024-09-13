@@ -1,0 +1,795 @@
+[gd_scene load_steps=51 format=3 uid="uid://bkr7boe6pgare"]
+
+[ext_resource type="Script" path="res://world2/World2.gd" id="1_4c552"]
+[ext_resource type="AudioStream" uid="uid://cp78e4x4wkvmy" path="res://music/battle_game2.mp3" id="2_7ib7u"]
+[ext_resource type="PackedScene" uid="uid://c3rn7in1w7hw4" path="res://camera/Camera2D.tscn" id="3_okho2"]
+[ext_resource type="Texture2D" uid="uid://li5wad0abmcd" path="res://back/location(version2).png" id="4_hqagx"]
+[ext_resource type="PackedScene" uid="uid://bh0oh5yef7wwu" path="res://world2/spawner2.tscn" id="5_hypcq"]
+[ext_resource type="Shader" path="res://enemies/Enemy_dmg.gdshader" id="6_lwd7q"]
+[ext_resource type="Texture2D" uid="uid://ba0t62g5p5xqf" path="res://enemies/Illustration2.png" id="7_0cci0"]
+[ext_resource type="Script" path="res://enemies/DeathParticles.gd" id="8_y423t"]
+[ext_resource type="Texture2D" uid="uid://cbpgfva7xb5pl" path="res://enemies/Illustrat4ion2.png" id="9_4terj"]
+[ext_resource type="Shader" path="res://world/Rain.gdshader" id="9_groub"]
+[ext_resource type="Script" path="res://world2/color_rect2.gd" id="10_bqa7h"]
+[ext_resource type="Texture2D" uid="uid://b1woyyd3jum2e" path="res://enemies/monster7.png" id="10_k3cex"]
+[ext_resource type="Shader" path="res://world/filter.gdshader" id="11_1rcej"]
+[ext_resource type="AudioStream" uid="uid://dptsu3i11a151" path="res://world/grom.mp3" id="12_xdlfa"]
+[ext_resource type="Script" path="res://world/Interface.gd" id="13_v8k5v"]
+[ext_resource type="PackedScene" uid="uid://c7qkcbxktl7ef" path="res://Bar_HP/health_bar.tscn" id="14_oxvjv"]
+[ext_resource type="PackedScene" uid="uid://cd2fod5r0nxki" path="res://xp/XpProgressBar.tscn" id="15_l75lh"]
+[ext_resource type="FontFile" uid="uid://dxga68xb1yaik" path="res://font/Motrhead Grotesk.ttf" id="16_ds81k"]
+[ext_resource type="Script" path="res://world/Label.gd" id="17_tuhx1"]
+[ext_resource type="Script" path="res://world/GameTimerLabel.gd" id="18_rmse4"]
+[ext_resource type="Script" path="res://world/EnemyInfo.gd" id="19_tuxm5"]
+[ext_resource type="PackedScene" uid="uid://dcqfp5xndp2gg" path="res://gold.tscn" id="20_eh3c0"]
+[ext_resource type="PackedScene" uid="uid://buwrgpxvi5gfe" path="res://player/Player.tscn" id="21_lrcu4"]
+
+[sub_resource type="GDScript" id="GDScript_fmht6"]
+script/source = "extends Area2D
+
+var player = null
+var animPlayer = null
+var DESPAWN_DISTANCE = Globals.get_screen_diagonale() + 100
+var moveSpeed = 40
+var velocity = Vector2.ZERO
+var health = 3
+var Area2DNode
+var damage_amount = 1 # количество урона, которое будет наноситься
+var damage_interval = 0.15 # интервал нанесения урона в секундах
+var damage_timer = null
+var collision_correction_speed = 10.0  # Скорость корректировки коллизий
+var collision_recovery_time = 1.0  # Время восстановления после столкновения
+var collision_timer = 0.0
+var is_colliding = false
+var magnet_chance: float = 0.05
+
+var exp_shard_scene = preload(\"res://xp/XP.tscn\")
+var magnet_scene = preload(\"res://xp/magnet.tscn\")
+
+
+signal despawned(old_position)
+signal enemy_died
+
+func _ready():
+	add_to_group(\"enemy\")
+	add_to_group(\"enemies\")
+	player = get_node(\"/root/World/Player\")
+	animPlayer = $AnimPlayer
+	create_damage_timer()
+
+func _physics_process(delta):
+	check_distance_to_player_and_despawn()
+	check_initial_collision()
+	if collision_timer > 0:
+		collision_timer -= delta
+	else:
+		is_colliding = false
+
+	if player and not is_colliding:
+		var to_player = (player.position - position).normalized()
+		velocity = to_player * moveSpeed
+
+	position += velocity * delta
+	
+	# Предотвращение коллизий с другими врагами
+	prevent_overlap(delta)
+
+func create_damage_timer():
+	damage_timer = Timer.new()
+	add_child(damage_timer)
+	damage_timer.set_wait_time(damage_interval) # устанавливаем интервал таймера
+	damage_timer.set_one_shot(false) # делаем таймер повторяемым
+	damage_timer.timeout.connect(self._on_damage_timer_timeout)  # подключаем функцию нанесения урона к таймеру
+	damage_timer.start() # запускаем таймер
+
+func dealDMG():
+	return damage_amount
+
+func _on_Enemy_area_entered(area):
+	if area.is_in_group(\"bullet\"):
+		takeDmg(area.get_dmg())
+		if area.is_in_group(\"knife\"):
+			area.hitReg()
+
+func takeDmg(damage):
+	health -= damage
+	if animPlayer.current_animation == \"takeDmg\":
+		animPlayer.stop()
+	animPlayer.play(\"takeDmg\")
+	if health <= 0:
+		die()
+
+func _on_damage_timer_timeout() -> void:
+	# наносим урон всем объектам, находящимся в зоне
+	for body in get_overlapping_bodies():
+		print(\"Area2D found: \" + str(body))
+		if body.is_in_group(\"player\"):
+			body.damage(damage_amount)
+
+
+
+func die():
+	if randi() % 100 < magnet_chance * 100:
+		var magnet = magnet_scene.instantiate()
+		magnet.position = position
+		get_parent().add_child(magnet)
+	else:
+		var shard = exp_shard_scene.instantiate()
+		shard.position = position
+		get_parent().add_child(shard)
+	emit_signal(\"enemy_died\")
+	$Sprite2D.hide()
+	$CollisionShape2D.set_deferred(\"disabled\", true)
+	$DeathParticles.play()
+
+
+func _on_timer_timeout():
+	self.queue_free()
+
+
+func check_distance_to_player_and_despawn():
+	var player_pos = Globals.get_player_pos()
+	var distance_to_player = position.distance_to(player_pos)
+
+	if distance_to_player > DESPAWN_DISTANCE:
+		despawn()
+
+func despawn():
+	emit_signal(\"despawned\", global_position)
+	queue_free()
+
+func set_health(health):
+	# Здесь устанавливаем здоровье врага
+	self.health = health
+
+func _on_body_entered(body):
+	if body.is_in_group(\"enemies\"):
+		resolve_collision(body, 0)
+
+func prevent_overlap(delta):
+	for enemy in get_tree().get_nodes_in_group(\"enemies\"):
+		if enemy != self and is_overlapping(enemy):
+			resolve_collision(enemy, delta)
+
+func is_overlapping(enemy):
+	var my_shape = $CollisionShape2D.shape
+	var enemy_shape = enemy.get_node(\"CollisionShape2D\").shape
+	var my_transform = Transform2D(0, position)
+	var enemy_transform = Transform2D(0, enemy.position)
+	return my_shape.collide(my_transform, enemy_shape, enemy_transform)
+
+func resolve_collision(enemy, delta):
+	var direction = (position - enemy.position).normalized()
+	position += direction * collision_correction_speed * delta  # Плавное движение в сторону от врага
+	velocity = direction * collision_correction_speed  # Корректировка скорости для предотвращения коллизии
+	is_colliding = true
+	collision_timer = collision_recovery_time  # Установить таймер восстановления после столкновения
+
+func check_initial_collision():
+	for area in get_overlapping_areas():
+		if area.is_in_group(\"enemies\"):
+			resolve_collision(area, 0)
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yadn3"]
+resource_local_to_scene = true
+shader = ExtResource("6_lwd7q")
+shader_parameter/hit_opacity = 0.0
+
+[sub_resource type="CapsuleShape2D" id="1"]
+radius = 20.0
+height = 96.0
+
+[sub_resource type="Animation" id="Animation_4hr07"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/hit_opacity")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_enyo6"]
+resource_name = "takeDmg"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/hit_opacity")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_qck1i"]
+_data = {
+"RESET": SubResource("Animation_4hr07"),
+"takeDmg": SubResource("Animation_enyo6")
+}
+
+[sub_resource type="Gradient" id="Gradient_np47y"]
+offsets = PackedFloat32Array(0, 0.728477, 1)
+colors = PackedColorArray(1, 0, 0, 1, 1, 0, 0.0156863, 0.835294, 1, 1, 1, 0.188235)
+
+[sub_resource type="PackedScene" id="PackedScene_rqi7w"]
+_bundled = {
+"conn_count": 3,
+"conns": PackedInt32Array(0, 0, 41, 40, 2, 0, 0, 0, 0, 41, 42, 2, 0, 0, 5, 0, 44, 43, 2, 0, 0),
+"editable_instances": [],
+"names": PackedStringArray("Enemy", "z_index", "script", "enemy", "Area2D", "Sprite2D", "texture_filter", "material", "position", "scale", "texture", "CollisionShape2D", "shape", "AnimPlayer", "libraries", "autoplay", "AnimationPlayer", "DeathParticles", "emitting", "amount", "lifetime", "one_shot", "explosiveness", "randomness", "local_coords", "emission_shape", "emission_sphere_radius", "direction", "spread", "gravity", "initial_velocity_min", "initial_velocity_max", "linear_accel_max", "angle_max", "scale_amount_min", "scale_amount_max", "color", "color_initial_ramp", "CPUParticles2D", "Timer", "_on_Enemy_area_entered", "area_entered", "_on_body_entered", "_on_timer_timeout", "timeout"),
+"node_count": 6,
+"node_paths": [],
+"nodes": PackedInt32Array(-1, -1, 4, 0, -1, 2, 1, 0, 2, 1, 1, 3, 0, 0, 5, 5, -1, 5, 6, 0, 7, 2, 8, 3, 9, 4, 10, 5, 0, 0, 0, 11, 11, -1, 2, 9, 6, 12, 7, 0, 0, 0, 16, 13, -1, 2, 14, 8, 15, 9, 0, 0, 0, 38, 17, -1, 21, 18, 10, 19, 11, 20, 12, 21, 13, 22, 14, 23, 14, 24, 13, 25, 0, 26, 15, 27, 16, 28, 17, 29, 18, 30, 19, 31, 20, 32, 19, 33, 21, 34, 22, 35, 22, 36, 23, 37, 24, 2, 25, 0, 4, 0, 39, 39, -1, 1, 21, 13, 0),
+"variants": [1, SubResource("GDScript_fmht6"), SubResource("ShaderMaterial_yadn3"), Vector2(0, 3.8147e-06), Vector2(0.55, 0.59125), ExtResource("7_0cci0"), Vector2(2, 2), SubResource("1"), {
+"": SubResource("AnimationLibrary_qck1i")
+}, "RESET", false, 100, 2.0, true, 1.0, 5.0, Vector2(1, 1), 180.0, Vector2(0, 100), 100.0, 200.0, 360.0, 3.0, Color(0.65098, 0, 0, 1), SubResource("Gradient_np47y"), ExtResource("8_y423t")],
+"version": 3
+}
+
+[sub_resource type="GDScript" id="GDScript_2i4b5"]
+script/source = "extends Area2D
+
+var player = null
+var animPlayer = null
+var DESPAWN_DISTANCE = Globals.get_screen_diagonale() + 100
+var moveSpeed = 35
+var velocity = Vector2.ZERO
+var health = 3
+var Area2DNode
+var damage_amount = 1 # количество урона, которое будет наноситься
+var damage_interval = 0.15 # интервал нанесения урона в секундах
+var damage_timer = null
+var collision_correction_speed = 10.0
+var collision_recovery_time = 1.0  # Время восстановления после столкновения
+var collision_timer = 0.0
+var is_colliding = false
+var magnet_chance: float = 0.05
+
+var exp_shard_scene = preload(\"res://xp/XP.tscn\")
+var magnet_scene = preload(\"res://xp/magnet.tscn\")
+
+signal despawned(old_position)
+signal enemy_died
+
+func _ready():
+	add_to_group(\"enemy\")
+	add_to_group(\"enemies\")
+	player = get_node(\"/root/World/Player\")
+	animPlayer = $AnimPlayer
+	create_damage_timer()
+	check_initial_collision()
+
+func _physics_process(delta):
+	check_distance_to_player_and_despawn()
+	check_initial_collision()
+	if collision_timer > 0:
+		collision_timer -= delta
+	else:
+		is_colliding = false
+
+	if player and not is_colliding:
+		var to_player = (player.position - position).normalized()
+		velocity = to_player * moveSpeed
+
+	position += velocity * delta
+	
+	# Предотвращение коллизий с другими врагами
+	prevent_overlap(delta)
+
+func create_damage_timer():
+	damage_timer = Timer.new()
+	add_child(damage_timer)
+	damage_timer.set_wait_time(damage_interval) # устанавливаем интервал таймера
+	damage_timer.set_one_shot(false) # делаем таймер повторяемым
+	damage_timer.timeout.connect(self._on_damage_timer_timeout)  # подключаем функцию нанесения урона к таймеру
+	damage_timer.start() # запускаем таймер
+
+func dealDMG():
+	return damage_amount
+
+func _on_Enemy_area_entered(area):
+	if area.is_in_group(\"bullet\"):
+		takeDmg(area.get_dmg())
+		if area.is_in_group(\"knife\"):
+			area.hitReg()
+
+func takeDmg(damage):
+	health -= damage
+	if animPlayer.current_animation == \"takeDmg\":
+		animPlayer.stop()
+	animPlayer.play(\"takeDmg\")
+	if health <= 0:
+		die()
+
+func _on_damage_timer_timeout() -> void:
+	# наносим урон всем объектам, находящимся в зоне
+	for body in get_overlapping_bodies():
+		if body.is_in_group(\"player\"):
+			body.damage(damage_amount)
+
+func die():
+	if randi() % 100 < magnet_chance * 100:
+		var magnet = magnet_scene.instantiate()
+		magnet.position = position
+		get_parent().add_child(magnet)
+	else:
+		var shard = exp_shard_scene.instantiate()
+		shard.position = position
+		get_parent().add_child(shard)
+	emit_signal(\"enemy_died\")
+	$Sprite2D.hide()
+	$CollisionShape2D.set_deferred(\"disabled\", true)
+	$DeathParticles.play()
+
+func _on_timer_timeout():
+	self.queue_free()
+
+
+func check_distance_to_player_and_despawn():
+	var player_pos = Globals.get_player_pos()
+	var distance_to_player = position.distance_to(player_pos)
+
+	if distance_to_player > DESPAWN_DISTANCE:
+		despawn()
+
+func despawn():
+	emit_signal(\"despawned\", global_position)
+	queue_free()
+
+func set_health(health):
+	# Здесь устанавливаем здоровье врага
+	self.health = health
+
+func _on_body_entered(body):
+	if body.is_in_group(\"enemies\"):
+		resolve_collision(body, 0)
+
+func prevent_overlap(delta):
+	for enemy in get_tree().get_nodes_in_group(\"enemies\"):
+		if enemy != self and is_overlapping(enemy):
+			resolve_collision(enemy, delta)
+
+func is_overlapping(enemy):
+	var my_shape = $CollisionShape2D.shape
+	var enemy_shape = enemy.get_node(\"CollisionShape2D\").shape
+	var my_transform = Transform2D(0, position)
+	var enemy_transform = Transform2D(0, enemy.position)
+	return my_shape.collide(my_transform, enemy_shape, enemy_transform)
+
+func resolve_collision(enemy, delta):
+	var direction = (position - enemy.position).normalized()
+	position += direction * collision_correction_speed * delta  # Плавное движение в сторону от врага
+	velocity = direction * collision_correction_speed  # Корректировка скорости для предотвращения коллизии
+	is_colliding = true
+	collision_timer = collision_recovery_time  # Установить таймер восстановления после столкновения
+
+func check_initial_collision():
+	for area in get_overlapping_areas():
+		if area.is_in_group(\"enemies\"):
+			resolve_collision(area, 0)
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jyg55"]
+resource_local_to_scene = true
+shader = ExtResource("6_lwd7q")
+shader_parameter/hit_opacity = 0.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_gsopf"]
+radius = 16.0
+height = 72.0
+
+[sub_resource type="Animation" id="Animation_6cgdo"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/hit_opacity")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_kjc3o"]
+resource_name = "takeDmg"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/hit_opacity")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_i3xpn"]
+_data = {
+"RESET": SubResource("Animation_6cgdo"),
+"takeDmg": SubResource("Animation_kjc3o")
+}
+
+[sub_resource type="Gradient" id="Gradient_8hcnw"]
+offsets = PackedFloat32Array(0, 0.728477, 1)
+colors = PackedColorArray(1, 0, 0, 1, 1, 0, 0.0156863, 0.835294, 1, 1, 1, 0.188235)
+
+[sub_resource type="PackedScene" id="PackedScene_hdt5d"]
+_bundled = {
+"conn_count": 4,
+"conns": PackedInt32Array(0, 0, 44, 43, 2, 0, 0, 0, 0, 44, 45, 2, 0, 0, 5, 0, 47, 46, 2, 0, 0, 6, 0, 47, 48, 2, 0, 0),
+"editable_instances": [],
+"names": PackedStringArray("Enemy", "z_index", "script", "enemy", "no aura", "Area2D", "Sprite2D", "texture_filter", "material", "position", "scale", "texture", "CollisionShape2D", "shape", "AnimPlayer", "libraries", "autoplay", "AnimationPlayer", "DeathParticles", "emitting", "amount", "lifetime", "one_shot", "explosiveness", "randomness", "local_coords", "emission_shape", "emission_sphere_radius", "direction", "spread", "gravity", "initial_velocity_min", "initial_velocity_max", "linear_accel_max", "angle_max", "scale_amount_min", "scale_amount_max", "color", "color_initial_ramp", "CPUParticles2D", "Timer", "CollisionTimer", "autostart", "_on_Enemy_area_entered", "area_entered", "_on_body_entered", "_on_timer_timeout", "timeout", "check_initial_collision"),
+"node_count": 7,
+"node_paths": [],
+"nodes": PackedInt32Array(-1, -1, 5, 0, -1, 2, 1, 0, 2, 1, 2, 3, 4, 0, 0, 6, 6, -1, 5, 7, 0, 8, 2, 9, 3, 10, 4, 11, 5, 0, 0, 0, 12, 12, -1, 2, 10, 6, 13, 7, 0, 0, 0, 17, 14, -1, 2, 15, 8, 16, 9, 0, 0, 0, 39, 18, -1, 21, 19, 10, 20, 11, 21, 12, 22, 13, 23, 14, 24, 14, 25, 13, 26, 0, 27, 15, 28, 16, 29, 17, 30, 18, 31, 19, 32, 20, 33, 19, 34, 21, 35, 22, 36, 22, 37, 23, 38, 24, 2, 25, 0, 4, 0, 40, 40, -1, 1, 22, 13, 0, 0, 0, 40, 41, -1, 1, 42, 13, 0),
+"variants": [1, SubResource("GDScript_2i4b5"), SubResource("ShaderMaterial_jyg55"), Vector2(8, 0), Vector2(0.65, 0.7025), ExtResource("9_4terj"), Vector2(2, 2), SubResource("CapsuleShape2D_gsopf"), {
+"": SubResource("AnimationLibrary_i3xpn")
+}, "RESET", false, 100, 2.0, true, 1.0, 5.0, Vector2(1, 1), 180.0, Vector2(0, 100), 100.0, 200.0, 360.0, 3.0, Color(0.65098, 0, 0, 1), SubResource("Gradient_8hcnw"), ExtResource("8_y423t")],
+"version": 3
+}
+
+[sub_resource type="GDScript" id="GDScript_mpqit"]
+script/source = "extends Area2D
+
+var player = null
+var animPlayer = null
+var DESPAWN_DISTANCE = Globals.get_screen_diagonale() + 100
+var moveSpeed = 35
+var velocity = Vector2.ZERO
+var health = 3
+var Area2DNode
+var damage_amount = 1 # количество урона, которое будет наноситься
+var damage_interval = 0.15 # интервал нанесения урона в секундах
+var damage_timer = null
+var collision_correction_speed = 10.0
+var collision_recovery_time = 1.0  # Время восстановления после столкновения
+var collision_timer = 0.0
+var is_colliding = false
+var magnet_chance: float = 0.05
+
+var exp_shard_scene = preload(\"res://xp/XP.tscn\")
+var magnet_scene = preload(\"res://xp/magnet.tscn\")
+
+signal despawned(old_position)
+signal enemy_died
+
+func _ready():
+	add_to_group(\"enemy\")
+	add_to_group(\"enemies\")
+	player = get_node(\"/root/World/Player\")
+	animPlayer = $AnimPlayer
+	create_damage_timer()
+
+func _physics_process(delta):
+	check_distance_to_player_and_despawn()
+	check_initial_collision()
+	if collision_timer > 0:
+		collision_timer -= delta
+	else:
+		is_colliding = false
+
+	if player and not is_colliding:
+		var to_player = (player.position - position).normalized()
+		velocity = to_player * moveSpeed
+
+	position += velocity * delta
+	
+	# Предотвращение коллизий с другими врагами
+	prevent_overlap(delta)
+
+func create_damage_timer():
+	damage_timer = Timer.new()
+	add_child(damage_timer)
+	damage_timer.set_wait_time(damage_interval) # устанавливаем интервал таймера
+	damage_timer.set_one_shot(false) # делаем таймер повторяемым
+	damage_timer.timeout.connect(self._on_damage_timer_timeout)  # подключаем функцию нанесения урона к таймеру
+	damage_timer.start() # запускаем таймер
+
+func _on_Enemy_area_entered(area):
+	if area.is_in_group(\"bullet\"):
+		takeDmg(area.get_dmg())
+		if area.is_in_group(\"knife\"):
+			area.hitReg()
+
+
+func dealDMG():
+	return damage_amount
+
+func takeDmg(damage):
+	health -= damage
+	if animPlayer.current_animation == \"takeDmg\":
+		animPlayer.stop()
+	animPlayer.play(\"takeDmg\")
+	if health <= 0:
+		die()
+
+func _on_damage_timer_timeout() -> void:
+	# наносим урон всем объектам, находящимся в зоне
+	for body in get_overlapping_bodies():
+		if body.is_in_group(\"player\"):
+			body.damage(damage_amount)
+
+
+func die():
+	if randi() % 100 < magnet_chance * 100:
+		var magnet = magnet_scene.instantiate()
+		magnet.position = position
+		get_parent().add_child(magnet)
+	else:
+		var shard = exp_shard_scene.instantiate()
+		shard.position = position
+		get_parent().add_child(shard)
+	emit_signal(\"enemy_died\")
+	$Sprite2D.hide()
+	$CollisionShape2D.set_deferred(\"disabled\", true)
+	$DeathParticles.play()
+
+func _on_timer_timeout():
+	self.queue_free()
+
+
+func check_distance_to_player_and_despawn():
+	var player_pos = Globals.get_player_pos()
+	var distance_to_player = position.distance_to(player_pos)
+
+	if distance_to_player > DESPAWN_DISTANCE:
+		despawn()
+
+func despawn():
+	emit_signal(\"despawned\", global_position)
+	queue_free()
+
+func set_health(health):
+	# Здесь устанавливаем здоровье врага
+	self.health = health
+
+func _on_body_entered(body):
+	if body.is_in_group(\"enemies\"):
+		resolve_collision(body, 0)
+
+func prevent_overlap(delta):
+	for enemy in get_tree().get_nodes_in_group(\"enemies\"):
+		if enemy != self and is_overlapping(enemy):
+			resolve_collision(enemy, delta)
+
+func is_overlapping(enemy):
+	var my_shape = $CollisionShape2D.shape
+	var enemy_shape = enemy.get_node(\"CollisionShape2D\").shape
+	var my_transform = Transform2D(0, position)
+	var enemy_transform = Transform2D(0, enemy.position)
+	return my_shape.collide(my_transform, enemy_shape, enemy_transform)
+
+func resolve_collision(enemy, delta):
+	var direction = (position - enemy.position).normalized()
+	position += direction * collision_correction_speed * delta  # Плавное движение в сторону от врага
+	velocity = direction * collision_correction_speed  # Корректировка скорости для предотвращения коллизии
+	is_colliding = true
+	collision_timer = collision_recovery_time  # Установить таймер восстановления после столкновения
+
+func check_initial_collision():
+	for area in get_overlapping_areas():
+		if area.is_in_group(\"enemies\"):
+			resolve_collision(area, 0)
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wduwi"]
+resource_local_to_scene = true
+shader = ExtResource("6_lwd7q")
+shader_parameter/hit_opacity = 0.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qqk2h"]
+radius = 20.0
+height = 40.0
+
+[sub_resource type="Animation" id="Animation_x120y"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/hit_opacity")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_m4m2x"]
+resource_name = "takeDmg"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/hit_opacity")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_2yjk2"]
+_data = {
+"RESET": SubResource("Animation_x120y"),
+"takeDmg": SubResource("Animation_m4m2x")
+}
+
+[sub_resource type="Gradient" id="Gradient_kuxfe"]
+offsets = PackedFloat32Array(0, 0.728477, 1)
+colors = PackedColorArray(1, 0, 0, 1, 1, 0, 0.0156863, 0.835294, 1, 1, 1, 0.188235)
+
+[sub_resource type="PackedScene" id="PackedScene_rl7ts"]
+_bundled = {
+"conn_count": 4,
+"conns": PackedInt32Array(0, 0, 42, 41, 2, 0, 0, 0, 0, 42, 43, 2, 0, 0, 5, 0, 45, 44, 2, 0, 0, 6, 0, 45, 46, 2, 0, 0),
+"editable_instances": [],
+"names": PackedStringArray("Enemy", "z_index", "script", "Area2D", "Sprite2D", "texture_filter", "material", "scale", "texture", "CollisionShape2D", "position", "shape", "AnimPlayer", "libraries", "autoplay", "AnimationPlayer", "DeathParticles", "emitting", "amount", "lifetime", "one_shot", "explosiveness", "randomness", "local_coords", "emission_shape", "emission_sphere_radius", "direction", "spread", "gravity", "initial_velocity_min", "initial_velocity_max", "linear_accel_max", "angle_max", "scale_amount_min", "scale_amount_max", "color", "color_initial_ramp", "CPUParticles2D", "Timer", "CollisionTimer", "autostart", "_on_Enemy_area_entered", "area_entered", "_on_body_entered", "_on_timer_timeout", "timeout", "check_initial_collision"),
+"node_count": 7,
+"node_paths": [],
+"nodes": PackedInt32Array(-1, -1, 3, 0, -1, 2, 1, 0, 2, 1, 0, 0, 0, 4, 4, -1, 4, 5, 0, 6, 2, 7, 3, 8, 4, 0, 0, 0, 9, 9, -1, 3, 10, 5, 7, 6, 11, 7, 0, 0, 0, 15, 12, -1, 2, 13, 8, 14, 9, 0, 0, 0, 37, 16, -1, 21, 17, 10, 18, 11, 19, 12, 20, 13, 21, 14, 22, 14, 23, 13, 24, 0, 25, 15, 26, 16, 27, 17, 28, 18, 29, 19, 30, 20, 31, 19, 32, 21, 33, 22, 34, 22, 35, 23, 36, 24, 2, 25, 0, 4, 0, 38, 38, -1, 1, 20, 13, 0, 0, 0, 38, 39, -1, 1, 40, 13, 0),
+"variants": [1, SubResource("GDScript_mpqit"), SubResource("ShaderMaterial_wduwi"), Vector2(0.25, 0.25), ExtResource("10_k3cex"), Vector2(6.333, -6.657), Vector2(2, 2), SubResource("CapsuleShape2D_qqk2h"), {
+"": SubResource("AnimationLibrary_2yjk2")
+}, "RESET", false, 100, 2.0, true, 1.0, 5.0, Vector2(1, 1), 180.0, Vector2(0, 100), 100.0, 200.0, 360.0, 3.0, Color(0.65098, 0, 0, 1), SubResource("Gradient_kuxfe"), ExtResource("8_y423t")],
+"version": 3
+}
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_46w0x"]
+shader = ExtResource("9_groub")
+shader_parameter/count = 150
+shader_parameter/slant = 0.1
+shader_parameter/speed = 25.0
+shader_parameter/min_speed = 18.443
+shader_parameter/blur = 0.0005
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/size = Vector2(0.005, 0.2)
+shader_parameter/flash_intensity = 0.098
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1prpw"]
+shader = ExtResource("11_1rcej")
+shader_parameter/filter_color = Color(0, 0, 0.1, 0.5)
+shader_parameter/vignette_intensity = 0.75
+shader_parameter/vignette_radius = 1.5
+shader_parameter/vignette_smoothness = 0.679
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_25uhp"]
+resource_local_to_scene = true
+
+[node name="World" type="Node"]
+script = ExtResource("1_4c552")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_7ib7u")
+autoplay = true
+
+[node name="Camera2D" parent="." instance=ExtResource("3_okho2")]
+position = Vector2(0, 0)
+process_callback = 0
+position_smoothing_speed = 0.0
+drag_left_margin = 0.0
+drag_top_margin = 0.0
+drag_right_margin = 0.0
+drag_bottom_margin = 0.0
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(376, 144)
+texture = ExtResource("4_hqagx")
+
+[node name="spawner2" parent="." instance=ExtResource("5_hypcq")]
+enemies = Array[PackedScene]([SubResource("PackedScene_rqi7w"), SubResource("PackedScene_hdt5d"), SubResource("PackedScene_rl7ts")])
+
+[node name="UI" type="CanvasLayer" parent="."]
+process_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="UI"]
+material = SubResource("ShaderMaterial_46w0x")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("10_bqa7h")
+
+[node name="ColorFilter" type="ColorRect" parent="UI/ColorRect"]
+material = SubResource("ShaderMaterial_1prpw")
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+
+[node name="LightningSound" type="AudioStreamPlayer" parent="UI/ColorRect"]
+stream = ExtResource("12_xdlfa")
+volume_db = -6.501
+
+[node name="Interface" type="Control" parent="UI"]
+material = SubResource("ShaderMaterial_25uhp")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("13_v8k5v")
+
+[node name="HealthBar" parent="UI/Interface" instance=ExtResource("14_oxvjv")]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.483333
+anchor_top = 0.57037
+anchor_right = 0.483333
+anchor_bottom = 0.57037
+offset_left = -18.0
+offset_top = 54.0
+offset_right = -18.0
+offset_bottom = 54.0
+scale = Vector2(1.5, 1.5)
+metadata/_edit_use_anchors_ = true
+
+[node name="Control" parent="UI/Interface" instance=ExtResource("15_l75lh")]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_right = 0.0
+grow_horizontal = 1
+grow_vertical = 0
+
+[node name="Label" type="Label" parent="UI/Interface"]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 20.0
+offset_right = 128.0
+offset_bottom = 88.0
+theme_override_fonts/font = ExtResource("16_ds81k")
+theme_override_font_sizes/font_size = 48
+script = ExtResource("17_tuhx1")
+
+[node name="GameTimerLabel" type="Label" parent="UI/Interface"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 23.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("16_ds81k")
+theme_override_font_sizes/font_size = 80
+script = ExtResource("18_rmse4")
+
+[node name="EnemyInfo" type="Label" parent="UI/Interface"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 248.0
+offset_right = 152.0
+offset_bottom = 368.0
+theme_override_fonts/font = ExtResource("16_ds81k")
+theme_override_font_sizes/font_size = 34
+script = ExtResource("19_tuxm5")
+
+[node name="TextureRect" parent="UI/Interface" instance=ExtResource("20_eh3c0")]
+layout_mode = 1
+offset_left = -376.0
+offset_top = 64.0
+offset_right = -208.0
+offset_bottom = 136.0
+
+[node name="Player" parent="." instance=ExtResource("21_lrcu4")]
+position = Vector2(576, 320)

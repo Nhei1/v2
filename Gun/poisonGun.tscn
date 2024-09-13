@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://q44o733jej17"]
+
+[ext_resource type="Script" path="res://Gun/poisonGun.gd" id="1_mso4s"]
+
+[node name="poisonGun" type="Marker2D"]
+script = ExtResource("1_mso4s")
+
+[node name="AttackInterval" type="Timer" parent="."]
+one_shot = true

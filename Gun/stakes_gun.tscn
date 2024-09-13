@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://bgdcqh8t3h01j"]
+
+[ext_resource type="Script" path="res://Gun/stakesGun.gd" id="1_0vyg2"]
+
+[node name="stakesGun" type="Marker2D"]
+z_index = 1
+script = ExtResource("1_0vyg2")
+
+[node name="AttackInterval" type="Timer" parent="."]
+wait_time = 10.0
+one_shot = true

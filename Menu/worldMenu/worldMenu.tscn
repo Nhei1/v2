@@ -1,0 +1,312 @@
+[gd_scene load_steps=40 format=3 uid="uid://cpatkviq4uawk"]
+
+[ext_resource type="Script" path="res://Menu/worldMenu/world_menu.gd" id="1_mim7r"]
+[ext_resource type="Texture2D" uid="uid://dyte8girsxwda" path="res://Menu/menu/game1.png" id="1_ybjj6"]
+[ext_resource type="Shader" path="res://world/World.gdshader" id="2_2w61i"]
+[ext_resource type="Texture2D" uid="uid://b2hdou7lobhhq" path="res://Menu/worldMenu/World1.png" id="3_2xmxy"]
+[ext_resource type="Texture2D" uid="uid://ha1b4pf88f81" path="res://Menu/worldMenu/ramkA.png" id="4_4e1qu"]
+[ext_resource type="Texture2D" uid="uid://de0fani7hlb2u" path="res://Menu/worldMenu/panelWorldMenu.png" id="5_hessv"]
+[ext_resource type="Shader" path="res://Menu/worldMenu/worldMenu.gdshader" id="5_i3ea8"]
+[ext_resource type="Shader" path="res://world/Rain.gdshader" id="6_3edhb"]
+[ext_resource type="FontFile" uid="uid://ddwxwtqogbx83" path="res://font/Zaychik-Regular.ttf" id="6_8x1rm"]
+[ext_resource type="Shader" path="res://world3/World3.gdshader" id="7_6ab6n"]
+[ext_resource type="Theme" uid="uid://bj26sok85x2wd" path="res://Menu/cityMenu/menu_theme.tres" id="7_xj1gs"]
+[ext_resource type="Shader" path="res://world/filter.gdshader" id="8_ltqlu"]
+[ext_resource type="Texture2D" uid="uid://dptw3aetblgrq" path="res://Menu/worldMenu/left_d.png" id="9_gyq7e"]
+[ext_resource type="Texture2D" uid="uid://dntyb4xic060l" path="res://Menu/worldMenu/left_u.png" id="9_m2wva"]
+[ext_resource type="Texture2D" uid="uid://bilvylwlsatu6" path="res://Menu/worldMenu/right_d.png" id="11_4kd6q"]
+[ext_resource type="Texture2D" uid="uid://sn3oc2n4vprv" path="res://Menu/worldMenu/right_u.png" id="12_xp2ub"]
+
+[sub_resource type="Animation" id="Animation_3mvy2"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MarginContainer/VBoxContainer/TextureRect/ColorRect2:material:shader_parameter/vignette_radius")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+
+[sub_resource type="Animation" id="Animation_mobov"]
+resource_name = "fade_in"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MarginContainer/VBoxContainer/TextureRect/ColorRect2:material:shader_parameter/vignette_radius")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+
+[sub_resource type="Animation" id="Animation_tmyoh"]
+resource_name = "fade_out"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MarginContainer/VBoxContainer/TextureRect/ColorRect2:material:shader_parameter/vignette_radius")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_8spnm"]
+_data = {
+"RESET": SubResource("Animation_3mvy2"),
+"fade_in": SubResource("Animation_mobov"),
+"fade_out": SubResource("Animation_tmyoh")
+}
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ydwgi"]
+shader = ExtResource("2_2w61i")
+shader_parameter/projector_power = 0.328
+shader_parameter/vignette_param = 6.593
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ojynq"]
+shader = ExtResource("5_i3ea8")
+shader_parameter/projector_power = 1.0
+shader_parameter/vignette_intensity = 1.0
+shader_parameter/vignette_radius = 1.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4r7vo"]
+shader = ExtResource("2_2w61i")
+shader_parameter/projector_power = 0.123
+shader_parameter/vignette_param = 1.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4ax1k"]
+shader = ExtResource("6_3edhb")
+shader_parameter/count = 150
+shader_parameter/slant = 0.1
+shader_parameter/speed = 30.859
+shader_parameter/min_speed = 11.875
+shader_parameter/blur = 0.0005
+shader_parameter/colour = Color(1, 1, 1, 1)
+shader_parameter/size = Vector2(0.01, 0.2)
+shader_parameter/flash_intensity = 0.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fgfq5"]
+shader = ExtResource("7_6ab6n")
+shader_parameter/particle_count = 50
+shader_parameter/min_speed = 0.15
+shader_parameter/max_speed = 0.4
+shader_parameter/min_size = 0.002
+shader_parameter/max_size = 0.005
+shader_parameter/glow_color = Color(0.863703, 0.597876, 0.230518, 1)
+shader_parameter/glow_intensity = 2.0
+shader_parameter/angle_degrees = 149.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_oj6ho"]
+shader = ExtResource("8_ltqlu")
+shader_parameter/filter_color = Color(1, 0, 0, 0.501961)
+shader_parameter/vignette_intensity = 0.149
+shader_parameter/vignette_radius = 1.5
+shader_parameter/vignette_smoothness = 1.0
+
+[sub_resource type="Theme" id="Theme_4baox"]
+default_font = ExtResource("6_8x1rm")
+default_font_size = 80
+Label/colors/font_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_04hn4"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ie3kd"]
+texture = ExtResource("9_gyq7e")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bqb7u"]
+texture = ExtResource("9_gyq7e")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_5qssb"]
+texture = ExtResource("9_m2wva")
+texture_margin_top = 4.0
+expand_margin_bottom = 1.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_juj86"]
+texture = ExtResource("9_gyq7e")
+
+[sub_resource type="Theme" id="Theme_nuxnu"]
+Button/styles/disabled = SubResource("StyleBoxFlat_04hn4")
+Button/styles/focus = SubResource("StyleBoxTexture_ie3kd")
+Button/styles/hover = SubResource("StyleBoxTexture_bqb7u")
+Button/styles/normal = SubResource("StyleBoxTexture_5qssb")
+Button/styles/pressed = SubResource("StyleBoxTexture_juj86")
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_sivdm"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_f25gt"]
+texture = ExtResource("11_4kd6q")
+texture_margin_right = 6.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_sqlce"]
+texture = ExtResource("11_4kd6q")
+texture_margin_right = 6.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_2gg7o"]
+texture = ExtResource("12_xp2ub")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_1qt5c"]
+texture = ExtResource("11_4kd6q")
+texture_margin_right = 6.0
+
+[sub_resource type="Theme" id="Theme_f13rl"]
+Button/styles/disabled = SubResource("StyleBoxEmpty_sivdm")
+Button/styles/focus = SubResource("StyleBoxTexture_f25gt")
+Button/styles/hover = SubResource("StyleBoxTexture_sqlce")
+Button/styles/normal = SubResource("StyleBoxTexture_2gg7o")
+Button/styles/pressed = SubResource("StyleBoxTexture_1qt5c")
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mim7r")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_8spnm")
+}
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = ExtResource("1_ybjj6")
+expand_mode = 1
+
+[node name="ColorRect" type="ColorRect" parent="."]
+visible = false
+material = SubResource("ShaderMaterial_ydwgi")
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+theme_override_constants/margin_left = 100
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 100
+theme_override_constants/margin_bottom = 100
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+texture = ExtResource("3_2xmxy")
+expand_mode = 5
+
+[node name="ColorRect2" type="ColorRect" parent="MarginContainer/VBoxContainer/TextureRect"]
+z_index = 3
+material = SubResource("ShaderMaterial_ojynq")
+layout_mode = 0
+offset_right = 1724.0
+offset_bottom = 638.0
+
+[node name="Timer" type="Timer" parent="MarginContainer/VBoxContainer/TextureRect/ColorRect2"]
+
+[node name="ColorRect" type="ColorRect" parent="MarginContainer/VBoxContainer/TextureRect"]
+z_index = 2
+material = SubResource("ShaderMaterial_4r7vo")
+layout_mode = 0
+offset_right = 1728.0
+offset_bottom = 640.0
+
+[node name="ColorRectRain" type="ColorRect" parent="MarginContainer/VBoxContainer/TextureRect"]
+visible = false
+z_index = 2
+material = SubResource("ShaderMaterial_4ax1k")
+layout_mode = 0
+offset_right = 1724.0
+offset_bottom = 640.0
+
+[node name="ColorRectBattle" type="ColorRect" parent="MarginContainer/VBoxContainer/TextureRect"]
+visible = false
+material = SubResource("ShaderMaterial_fgfq5")
+layout_mode = 0
+offset_right = 1724.0
+offset_bottom = 638.0
+
+[node name="ColorRect3" type="ColorRect" parent="MarginContainer/VBoxContainer/TextureRect/ColorRectBattle"]
+material = SubResource("ShaderMaterial_oj6ho")
+layout_mode = 0
+offset_right = 1724.0
+offset_bottom = 638.0
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/TextureRect"]
+z_index = 3
+layout_mode = 2
+offset_left = -52.0
+offset_top = -34.0
+offset_right = 1772.0
+offset_bottom = 694.0
+texture = ExtResource("4_4e1qu")
+expand_mode = 1
+
+[node name="TextureRect2" type="TextureRect" parent="MarginContainer/VBoxContainer"]
+self_modulate = Color(0, 0, 0, 1)
+layout_mode = 2
+size_flags_vertical = 6
+texture = ExtResource("5_hessv")
+expand_mode = 5
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TextureRect2"]
+layout_mode = 0
+offset_left = 44.0
+offset_top = 52.0
+offset_right = 1676.0
+offset_bottom = 156.0
+theme = SubResource("Theme_4baox")
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 1
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="ButtonPlay" type="Button" parent="MarginContainer/VBoxContainer/Control"]
+layout_mode = 2
+offset_left = 662.0
+offset_top = -52.0
+offset_right = 1158.0
+offset_bottom = 84.0
+size_flags_horizontal = 4
+theme = ExtResource("7_xj1gs")
+text = "Play"
+
+[node name="ButtonLeft" type="Button" parent="MarginContainer/VBoxContainer/Control"]
+layout_mode = 0
+offset_left = 436.0
+offset_top = -68.0
+offset_right = 612.0
+offset_bottom = 84.0
+theme = SubResource("Theme_nuxnu")
+
+[node name="ButtonRight" type="Button" parent="MarginContainer/VBoxContainer/Control"]
+layout_mode = 0
+offset_left = 1204.0
+offset_top = -68.0
+offset_right = 1380.0
+offset_bottom = 84.0
+theme = SubResource("Theme_f13rl")
+
+[connection signal="timeout" from="MarginContainer/VBoxContainer/TextureRect/ColorRect2/Timer" to="." method="_on_timer_timeout"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/Control/ButtonPlay" to="." method="_on_button_play_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/Control/ButtonLeft" to="." method="_on_button_left_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/Control/ButtonRight" to="." method="_on_button_right_pressed"]

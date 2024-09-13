@@ -1,0 +1,93 @@
+[gd_scene load_steps=5 format=3 uid="uid://dnodrmxgg4ryu"]
+
+[ext_resource type="Script" path="res://Menu/shop/control.gd" id="1_mn473"]
+[ext_resource type="Texture2D" uid="uid://6wkenlgvepp0" path="res://Menu/shop/panel.png" id="1_x2akl"]
+[ext_resource type="FontFile" uid="uid://ddwxwtqogbx83" path="res://font/Zaychik-Regular.ttf" id="2_us4lw"]
+[ext_resource type="Theme" uid="uid://cjbguc5j6ieec" path="res://Menu/shop/shop_botton.tres" id="3_kid45"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_mn473")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+offset_left = 1024.0
+offset_top = 144.0
+offset_right = 3288.0
+offset_bottom = 3182.0
+scale = Vector2(0.28, 0.28)
+mouse_filter = 2
+texture = ExtResource("1_x2akl")
+
+[node name="MarginContainer" type="MarginContainer" parent="TextureRect"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.063
+anchor_top = 0.085
+anchor_right = 0.063
+anchor_bottom = 0.085
+offset_left = 0.367996
+offset_top = -1.23001
+offset_right = 1943.37
+offset_bottom = 2712.77
+mouse_filter = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 30
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect/MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="NameLabel" type="Label" parent="TextureRect/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_us4lw")
+theme_override_font_sizes/font_size = 250
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="TextureRect/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="TextureRect/MarginContainer/VBoxContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+expand_mode = 3
+
+[node name="DescriptionLabel" type="Label" parent="TextureRect/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_us4lw")
+theme_override_font_sizes/font_size = 200
+horizontal_alignment = 1
+
+[node name="CostLabel" type="Label" parent="TextureRect/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_us4lw")
+theme_override_font_sizes/font_size = 300
+horizontal_alignment = 1
+
+[node name="Control" type="Control" parent="TextureRect/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(200, 400)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Button" type="Button" parent="TextureRect/MarginContainer/VBoxContainer/Control"]
+layout_mode = 2
+anchor_top = 0.147
+anchor_bottom = 0.147
+offset_left = -1.57101
+offset_top = -85.5141
+offset_right = 1883.43
+offset_bottom = 357.486
+size_flags_horizontal = 3
+theme = ExtResource("3_kid45")
+text = "Buy"
+
+[connection signal="pressed" from="TextureRect/MarginContainer/VBoxContainer/Control/Button" to="." method="_on_button_pressed"]

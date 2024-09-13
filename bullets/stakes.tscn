@@ -1,0 +1,58 @@
+[gd_scene load_steps=8 format=3 uid="uid://dkndvhhjuix1v"]
+
+[ext_resource type="Script" path="res://bullets/stakes.gd" id="1_og2e1"]
+[ext_resource type="Shader" path="res://bullets/knive.gdshader" id="1_tq3hr"]
+[ext_resource type="Texture2D" uid="uid://djo0xh6deyllq" path="res://bullets/sprites/knives.png" id="2_jpg8h"]
+[ext_resource type="Texture2D" uid="uid://dswbd45moda6l" path="res://1663950806_57-top-fon-com-p-serii-shum-fon-foto-116.png" id="2_y0jhi"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lw7ih"]
+shader = ExtResource("1_tq3hr")
+shader_parameter/gradientRemap = Vector4(0.708, -2.683, 0, 0.264)
+shader_parameter/beamRemap = Vector4(0.98, 4.834, 2.119, 0.654)
+shader_parameter/color1 = null
+shader_parameter/color2 = Color(1, 1, 1, 1)
+shader_parameter/scale = Vector3(1, 8, 0)
+shader_parameter/threshold = 0.993
+shader_parameter/offset = 1.5
+shader_parameter/noise = ExtResource("2_y0jhi")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sdei0"]
+shader = ExtResource("1_tq3hr")
+shader_parameter/gradientRemap = Vector4(0.005, 0, 0.064, 0.045)
+shader_parameter/beamRemap = Vector4(1.053, 3.25, 3.262, 1.214)
+shader_parameter/color1 = null
+shader_parameter/color2 = Color(1, 1, 1, 1)
+shader_parameter/scale = Vector3(1, 5, 0)
+shader_parameter/threshold = 0.993
+shader_parameter/offset = 1.5
+shader_parameter/noise = ExtResource("2_y0jhi")
+
+[sub_resource type="CircleShape2D" id="1"]
+radius = 27.5726
+
+[node name="shot" type="Area2D" groups=["bullet", "no50%Armor"]]
+script = ExtResource("1_og2e1")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+material = SubResource("ShaderMaterial_lw7ih")
+position = Vector2(-1, 9.53674e-07)
+scale = Vector2(2.32, 5.4)
+texture = ExtResource("2_jpg8h")
+
+[node name="Sprite2D2" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_sdei0")
+position = Vector2(-4, 0.353956)
+rotation = 1.5708
+scale = Vector2(1.20174, 3.8898)
+texture = ExtResource("2_jpg8h")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("1")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 8.0
+autostart = true
+
+[connection signal="body_entered" from="." to="." method="_on_Bullet_body_entered"]
+[connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]

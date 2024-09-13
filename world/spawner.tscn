@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://dbmp362cbje4f"]
+
+[ext_resource type="Script" path="res://world/spawner.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://cqj8vjrm5qio4" path="res://enemies/Enemy.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://djbb7kf4kbji0" path="res://enemies/Enemy 2.tscn" id="3_iu3tt"]
+
+[node name="spawner" type="Node"]
+script = ExtResource("1")
+enemies = Array[PackedScene]([ExtResource("2"), ExtResource("3_iu3tt")])
+
+[node name="Timer" type="Timer" parent="."]
+
+[node name="Timer2" type="Timer" parent="."]
+
+[node name="Timer3" type="Timer" parent="."]
+
+[connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
+[connection signal="timeout" from="Timer2" to="." method="_on_timer_2_timeout"]
+[connection signal="timeout" from="Timer3" to="." method="_on_game_timer_timeout"]

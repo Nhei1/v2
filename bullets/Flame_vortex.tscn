@@ -1,0 +1,42 @@
+[gd_scene load_steps=6 format=3 uid="uid://cjf3fhdfc4upk"]
+
+[ext_resource type="Script" path="res://bullets/Flame_vortex.gd" id="1_qy2cd"]
+[ext_resource type="Texture2D" uid="uid://cjol3e3dpnd8n" path="res://bullets/sprites/fireboll 2.png" id="2_8g7nu"]
+[ext_resource type="Shader" path="res://bullets/Flame.gdshader" id="2_j0tu3"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_uiuny"]
+shader = ExtResource("2_j0tu3")
+shader_parameter/base_color = Color(0.886149, 0.585449, 0.147208, 1)
+shader_parameter/glow_color = Color(1, 0.783333, 0, 1)
+shader_parameter/glow_intensity = 0.336
+shader_parameter/blur_radius = 0.3
+shader_parameter/alpha_threshold = 6.426
+shader_parameter/distortion_amount = 0.036
+shader_parameter/time_scale = 7.5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mm20q"]
+radius = 13.35
+
+[node name="Faerball" type="Area2D" groups=["bullet"]]
+texture_filter = 4
+script = ExtResource("1_qy2cd")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+texture_repeat = 3
+material = SubResource("ShaderMaterial_uiuny")
+position = Vector2(-39, 1.19211e-07)
+rotation = -0.0541052
+scale = Vector2(0.05, 0.045)
+texture = ExtResource("2_8g7nu")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+scale = Vector2(1.5, 1.5)
+shape = SubResource("CircleShape2D_mm20q")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 1.5
+autostart = true
+
+[connection signal="body_entered" from="." to="." method="_on_Bullet_body_entered"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

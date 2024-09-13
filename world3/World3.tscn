@@ -1,0 +1,177 @@
+[gd_scene load_steps=28 format=3 uid="uid://cxrr0y1jhhspr"]
+
+[ext_resource type="Script" path="res://world3/World3.gd" id="1_rtn2q"]
+[ext_resource type="AudioStream" uid="uid://c2g65wajm2x4y" path="res://music/battle_game3.mp3" id="2_ha274"]
+[ext_resource type="PackedScene" uid="uid://c3rn7in1w7hw4" path="res://camera/Camera2D.tscn" id="3_dee0v"]
+[ext_resource type="Texture2D" uid="uid://li5wad0abmcd" path="res://back/location(version2).png" id="4_bq3mu"]
+[ext_resource type="PackedScene" uid="uid://rtp350hdmxkt" path="res://world3/spawner3.tscn" id="5_k8vds"]
+[ext_resource type="Script" path="res://world3/spawner3.gd" id="6_gx1xl"]
+[ext_resource type="PackedScene" uid="uid://djbb7kf4kbji0" path="res://enemies/Enemy 2.tscn" id="7_46f0p"]
+[ext_resource type="Shader" path="res://world3/World3.gdshader" id="7_x70k3"]
+[ext_resource type="PackedScene" uid="uid://csd503axg22jk" path="res://enemies/Enemy 3.tscn" id="8_jbfxa"]
+[ext_resource type="PackedScene" uid="uid://cqj8vjrm5qio4" path="res://enemies/Enemy.tscn" id="9_7sewi"]
+[ext_resource type="PackedScene" uid="uid://bv3bavrhlhpqe" path="res://enemies/Enemy 4.tscn" id="10_l0fgg"]
+[ext_resource type="Shader" path="res://world/filter.gdshader" id="11_a6l2a"]
+[ext_resource type="PackedScene" uid="uid://cvt70qurwcnnt" path="res://enemies/Enemy 5.tscn" id="11_uy65j"]
+[ext_resource type="Shader" path="res://Menu/worldMenu/worldMenu.gdshader" id="12_nmmnt"]
+[ext_resource type="Script" path="res://world/Interface.gd" id="13_5tpeu"]
+[ext_resource type="PackedScene" uid="uid://c7qkcbxktl7ef" path="res://Bar_HP/health_bar.tscn" id="14_4hx5r"]
+[ext_resource type="PackedScene" uid="uid://cd2fod5r0nxki" path="res://xp/XpProgressBar.tscn" id="15_hjq6b"]
+[ext_resource type="FontFile" uid="uid://dxga68xb1yaik" path="res://font/Motrhead Grotesk.ttf" id="16_m8kux"]
+[ext_resource type="Script" path="res://world/Label.gd" id="17_6s2wl"]
+[ext_resource type="Script" path="res://world/GameTimerLabel.gd" id="18_67iac"]
+[ext_resource type="Script" path="res://world/EnemyInfo.gd" id="19_qodne"]
+[ext_resource type="PackedScene" uid="uid://dcqfp5xndp2gg" path="res://gold.tscn" id="20_2n87w"]
+[ext_resource type="PackedScene" uid="uid://buwrgpxvi5gfe" path="res://player/Player.tscn" id="21_3ds6n"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_s7ehu"]
+shader = ExtResource("7_x70k3")
+shader_parameter/particle_count = 35
+shader_parameter/min_speed = 0.203
+shader_parameter/max_speed = 0.543
+shader_parameter/min_size = 0.002
+shader_parameter/max_size = 0.004
+shader_parameter/glow_color = Color(1, 0.5655, 0.21, 1)
+shader_parameter/glow_intensity = 2.0
+shader_parameter/angle_degrees = 149.016
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yj13e"]
+shader = ExtResource("11_a6l2a")
+shader_parameter/filter_color = Color(1, 0, 0, 0.501961)
+shader_parameter/vignette_intensity = 0.106
+shader_parameter/vignette_radius = 1.5
+shader_parameter/vignette_smoothness = 0.5
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qh8qj"]
+shader = ExtResource("12_nmmnt")
+shader_parameter/projector_power = 1.0
+shader_parameter/vignette_intensity = 1.0
+shader_parameter/vignette_radius = 0.922
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_25uhp"]
+resource_local_to_scene = true
+
+[node name="World" type="Node"]
+script = ExtResource("1_rtn2q")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+process_mode = 3
+stream = ExtResource("2_ha274")
+autoplay = true
+parameters/looping = true
+
+[node name="Camera2D" parent="." instance=ExtResource("3_dee0v")]
+position = Vector2(0, 0)
+process_callback = 0
+position_smoothing_speed = 0.0
+drag_left_margin = 0.0
+drag_top_margin = 0.0
+drag_right_margin = 0.0
+drag_bottom_margin = 0.0
+
+[node name="Background" type="Sprite2D" parent="."]
+z_index = -1
+position = Vector2(376, 144)
+texture = ExtResource("4_bq3mu")
+
+[node name="spawner3" parent="." instance=ExtResource("5_k8vds")]
+script = ExtResource("6_gx1xl")
+enemies = Array[PackedScene]([ExtResource("9_7sewi"), ExtResource("7_46f0p"), ExtResource("8_jbfxa"), ExtResource("10_l0fgg"), ExtResource("11_uy65j")])
+
+[node name="UI" type="CanvasLayer" parent="."]
+process_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="UI"]
+material = SubResource("ShaderMaterial_s7ehu")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorFilter" type="ColorRect" parent="UI/ColorRect"]
+material = SubResource("ShaderMaterial_yj13e")
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+
+[node name="ColorRect2" type="ColorRect" parent="UI/ColorRect"]
+material = SubResource("ShaderMaterial_qh8qj")
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+
+[node name="Interface" type="Control" parent="UI"]
+material = SubResource("ShaderMaterial_25uhp")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("13_5tpeu")
+
+[node name="HealthBar" parent="UI/Interface" instance=ExtResource("14_4hx5r")]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.483333
+anchor_top = 0.57037
+anchor_right = 0.483333
+anchor_bottom = 0.57037
+offset_left = -18.0
+offset_top = 54.0
+offset_right = -18.0
+offset_bottom = 54.0
+scale = Vector2(1.5, 1.5)
+metadata/_edit_use_anchors_ = true
+
+[node name="Control" parent="UI/Interface" instance=ExtResource("15_hjq6b")]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_right = 0.0
+grow_horizontal = 1
+grow_vertical = 0
+
+[node name="Label" type="Label" parent="UI/Interface"]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 20.0
+offset_right = 128.0
+offset_bottom = 88.0
+theme_override_fonts/font = ExtResource("16_m8kux")
+theme_override_font_sizes/font_size = 48
+script = ExtResource("17_6s2wl")
+
+[node name="GameTimerLabel" type="Label" parent="UI/Interface"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 23.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("16_m8kux")
+theme_override_font_sizes/font_size = 80
+script = ExtResource("18_67iac")
+
+[node name="EnemyInfo" type="Label" parent="UI/Interface"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 248.0
+offset_right = 152.0
+offset_bottom = 368.0
+theme_override_fonts/font = ExtResource("16_m8kux")
+theme_override_font_sizes/font_size = 34
+script = ExtResource("19_qodne")
+
+[node name="TextureRect" parent="UI/Interface" instance=ExtResource("20_2n87w")]
+layout_mode = 1
+offset_left = -376.0
+offset_top = 64.0
+offset_right = -208.0
+offset_bottom = 136.0
+
+[node name="Player" parent="." instance=ExtResource("21_3ds6n")]
+position = Vector2(576, 320)

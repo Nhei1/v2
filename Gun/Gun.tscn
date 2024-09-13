@@ -1,9 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://clyfmckj4p3mi"]
+[gd_scene load_steps=2 format=3 uid="uid://d1ngr0lfj6c48"]
 
-[ext_resource type="Script" path="res://player/Gun.gd" id="1"]
+[ext_resource type="Script" path="res://Gun/Gun.gd" id="1_61rxi"]
 
 [node name="Gun" type="Marker2D"]
-script = ExtResource("1")
+script = ExtResource("1_61rxi")
 
 [node name="AttackInterval" type="Timer" parent="."]
 wait_time = 0.085

@@ -1,0 +1,31 @@
+[gd_scene load_steps=4 format=3 uid="uid://6q0axmn61oae"]
+
+[ext_resource type="Texture2D" uid="uid://c52vrgktugpdr" path="res://world/gold.png" id="1_envp8"]
+[ext_resource type="FontFile" uid="uid://dxga68xb1yaik" path="res://font/Motrhead Grotesk.ttf" id="2_0ev71"]
+[ext_resource type="Script" path="res://goldLabel.gd" id="3_pwrfe"]
+
+[node name="TextureRect" type="TextureRect"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -184.0
+offset_right = 418.0
+offset_bottom = 269.0
+grow_horizontal = 0
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("1_envp8")
+stretch_mode = 2
+
+[node name="Label2" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -575.333
+offset_top = -80.0
+offset_right = -182.333
+offset_bottom = 305.0
+grow_horizontal = 0
+theme_override_fonts/font = ExtResource("2_0ev71")
+theme_override_font_sizes/font_size = 300
+script = ExtResource("3_pwrfe")

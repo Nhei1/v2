@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://cd2fod5r0nxki"]
+
+[ext_resource type="Texture2D" uid="uid://dhg73ujmepr71" path="res://xp/bar.png" id="1_fqxgw"]
+[ext_resource type="Texture2D" uid="uid://rrmqnmpuifnl" path="res://xp/barrrf1.png" id="2_rfeiq"]
+[ext_resource type="Texture2D" uid="uid://cxsw35vu3navt" path="res://xp/barr1.png" id="3_i6mc4"]
+[ext_resource type="Script" path="res://xp/TextureProgressBar.gd" id="4_3imcl"]
+
+[node name="Control" type="Control"]
+modulate = Color(0.682353, 0, 0, 1)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.127
+anchor_bottom = 0.127
+offset_left = 13.535
+offset_top = -137.16
+offset_right = 18911.5
+offset_bottom = 204.842
+scale = Vector2(0.1, 0.1)
+texture_under = ExtResource("1_fqxgw")
+texture_over = ExtResource("2_rfeiq")
+texture_progress = ExtResource("3_i6mc4")
+script = ExtResource("4_3imcl")

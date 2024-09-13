@@ -1,0 +1,28 @@
+[gd_resource type="Theme" load_steps=7 format=3 uid="uid://b61d0pbv4mnlm"]
+
+[ext_resource type="Texture2D" uid="uid://dmccyhxh5ikkx" path="res://Menu/Lvl_up/button_lvl_up.png" id="1_cjw1v"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c364p"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_pa4sw"]
+texture = ExtResource("1_cjw1v")
+region_rect = Rect2(1066, 0, 884, 1035)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_3idyf"]
+texture = ExtResource("1_cjw1v")
+region_rect = Rect2(0, 14, 866, 1012)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_fxpuj"]
+texture = ExtResource("1_cjw1v")
+region_rect = Rect2(0, 14, 866, 1012)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_yk8kw"]
+texture = ExtResource("1_cjw1v")
+region_rect = Rect2(1066, 0, 884, 1035)
+
+[resource]
+Button/styles/disabled = SubResource("StyleBoxFlat_c364p")
+Button/styles/focus = SubResource("StyleBoxTexture_pa4sw")
+Button/styles/hover = SubResource("StyleBoxTexture_3idyf")
+Button/styles/normal = SubResource("StyleBoxTexture_fxpuj")
+Button/styles/pressed = SubResource("StyleBoxTexture_yk8kw")

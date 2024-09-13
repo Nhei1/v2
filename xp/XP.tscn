@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3 uid="uid://do8ylxmob6xay"]
+
+[ext_resource type="Script" path="res://xp/XP.gd" id="1_rxclt"]
+[ext_resource type="Texture2D" uid="uid://behgnno11ylsq" path="res://xp/Безымянный-1.png" id="3_1ocjh"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_lqtmu"]
+radius = 48.0
+
+[node name="XP" type="Area2D" groups=["XP"]]
+z_index = 2
+collision_layer = 2
+collision_mask = 2
+script = ExtResource("1_rxclt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+light_mask = 3
+visibility_layer = 3
+shape = SubResource("CircleShape2D_lqtmu")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("3_1ocjh")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

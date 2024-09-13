@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://ecpd0wtajo3u"]
+
+[ext_resource type="Texture2D" uid="uid://bqlorlfjqp8s" path="res://icon.png" id="1_llvxo"]
+
+[node name="Button" type="Button"]
+modulate = Color(0.0352941, 0, 0.168627, 1)
+offset_right = 72.0
+offset_bottom = 72.0
+icon = ExtResource("1_llvxo")

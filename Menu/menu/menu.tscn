@@ -1,0 +1,74 @@
+[gd_scene load_steps=9 format=3 uid="uid://bpnydcivk7fh1"]
+
+[ext_resource type="Script" path="res://Menu/menu/menu.gd" id="1_ajerf"]
+[ext_resource type="Texture2D" uid="uid://c86xfraxjvgdr" path="res://Menu/menu/dom.png" id="2_wonw0"]
+[ext_resource type="Theme" uid="uid://bj26sok85x2wd" path="res://Menu/cityMenu/menu_theme.tres" id="3_jira2"]
+[ext_resource type="Theme" uid="uid://bhuk0e7mtt0kr" path="res://Menu/Lvl_up/menu_lvl_up_button.tres" id="4_vn4hf"]
+[ext_resource type="Shader" path="res://world/World2.gdshader" id="5_l34lm"]
+[ext_resource type="Texture2D" uid="uid://dyte8girsxwda" path="res://Menu/menu/game1.png" id="6_1e6c4"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cgef4"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hoynl"]
+shader = ExtResource("5_l34lm")
+shader_parameter/projector_power = 0.213
+shader_parameter/vignette_param = 10.0
+shader_parameter/alpha = 0.557
+
+[node name="Menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ajerf")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_cgef4")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_wonw0")
+expand_mode = 3
+
+[node name="StartButton" type="Button" parent="."]
+layout_mode = 2
+offset_left = 1248.0
+offset_top = 208.0
+offset_right = 1768.0
+offset_bottom = 368.0
+theme = ExtResource("3_jira2")
+text = "Play"
+
+[node name="OptionsButton" type="Button" parent="."]
+layout_mode = 2
+offset_left = 1280.0
+offset_top = 400.0
+offset_right = 1759.0
+offset_bottom = 527.0
+theme = ExtResource("4_vn4hf")
+disabled = true
+text = "Options"
+icon_alignment = 1
+
+[node name="QuitButton" type="Button" parent="."]
+layout_mode = 2
+offset_left = 1392.0
+offset_top = 568.0
+offset_right = 1752.0
+offset_bottom = 688.0
+theme = ExtResource("4_vn4hf")
+text = "Exit"
+
+[node name="Background" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_hoynl")
+position = Vector2(956, 544)
+scale = Vector2(0.234027, 0.236676)
+texture = ExtResource("6_1e6c4")
+
+[connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="QuitButton" to="." method="_on_quit_button_pressed"]

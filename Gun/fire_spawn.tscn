@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://vjkdlm0w3pjv"]
+
+[ext_resource type="Script" path="res://Gun/FireSpawn.gd" id="1_ld3of"]
+
+[node name="FireSpawn" type="Marker2D"]
+position = Vector2(1, 0)
+script = ExtResource("1_ld3of")
+
+[node name="AttackInterval" type="Timer" parent="."]
+wait_time = 0.085
+one_shot = true

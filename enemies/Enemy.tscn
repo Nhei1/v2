@@ -1,24 +1,126 @@
-[gd_scene load_steps=4 format=3 uid="uid://b4pxcalqio5ul"]
+[gd_scene load_steps=12 format=3 uid="uid://cqj8vjrm5qio4"]
 
-[ext_resource type="Texture2D" uid="uid://cqpc5clawa4tw" path="res://enemies/knight_3.png" id="1"]
-[ext_resource type="Script" path="res://enemies/Enemy.gd" id="2"]
+[ext_resource type="Script" path="res://enemies/Enemy.gd" id="1_w7yo3"]
+[ext_resource type="Shader" path="res://enemies/Enemy_dmg.gdshader" id="2_rlrr0"]
+[ext_resource type="Texture2D" uid="uid://ba0t62g5p5xqf" path="res://enemies/Illustration2.png" id="3_wu4x8"]
+[ext_resource type="Script" path="res://enemies/DeathParticles.gd" id="4_4lmpb"]
 
-[sub_resource type="CapsuleShape2D" id="1"]
-height = 46.0
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ccl1a"]
+radius = 80.0
+height = 160.0
 
-[node name="Enemy" type="Area2D" groups=["enemy"]]
-monitorable = false
-script = ExtResource("2")
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wduwi"]
+resource_local_to_scene = true
+shader = ExtResource("2_rlrr0")
+shader_parameter/hit_opacity = 0.0
+
+[sub_resource type="Animation" id="Animation_x120y"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/hit_opacity")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_m4m2x"]
+resource_name = "takeDmg"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:material:shader_parameter/hit_opacity")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_2yjk2"]
+_data = {
+"RESET": SubResource("Animation_x120y"),
+"takeDmg": SubResource("Animation_m4m2x")
+}
+
+[sub_resource type="Gradient" id="Gradient_kuxfe"]
+offsets = PackedFloat32Array(0, 0.728477, 1)
+colors = PackedColorArray(1, 0, 0, 1, 1, 0, 0.0156863, 0.835294, 1, 1, 1, 0.188235)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qqk2h"]
+radius = 40.0
+height = 80.0
+
+[node name="Enemy" type="CharacterBody2D"]
+z_index = 1
+script = ExtResource("1_w7yo3")
+
+[node name="Area2D" type="Area2D" parent="." groups=["enemy"]]
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CapsuleShape2D_ccl1a")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture_filter = 1
-scale = Vector2(2, 2)
-texture = ExtResource("1")
+material = SubResource("ShaderMaterial_wduwi")
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("3_wu4x8")
+
+[node name="AnimPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_2yjk2")
+}
+autoplay = "RESET"
+
+[node name="DeathParticles" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 100
+lifetime = 2.0
+one_shot = true
+explosiveness = 1.0
+randomness = 1.0
+local_coords = true
+emission_shape = 1
+emission_sphere_radius = 5.0
+direction = Vector2(1, 1)
+spread = 180.0
+gravity = Vector2(0, 100)
+initial_velocity_min = 100.0
+initial_velocity_max = 200.0
+linear_accel_max = 100.0
+angle_max = 360.0
+scale_amount_min = 3.0
+scale_amount_max = 3.0
+color = Color(0.65098, 0, 0, 1)
+color_initial_ramp = SubResource("Gradient_kuxfe")
+script = ExtResource("4_4lmpb")
+
+[node name="Timer" type="Timer" parent="DeathParticles"]
+one_shot = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 14)
 scale = Vector2(2, 2)
-shape = SubResource("1")
+shape = SubResource("CapsuleShape2D_qqk2h")
 
-[connection signal="area_entered" from="." to="." method="_on_Enemy_area_entered"]
-[connection signal="visibility_changed" from="." to="." method="_on_Enemy_visibility_changed"]
+[node name="DamageTimer" type="Timer" parent="."]
+wait_time = 0.15
+
+[node name="SlowTimer" type="Timer" parent="."]
+wait_time = 3.0
+one_shot = true
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="Area2D" to="." method="_on_area_2d_body_exited"]
+[connection signal="timeout" from="DeathParticles/Timer" to="." method="_on_timer_timeout"]
+[connection signal="timeout" from="DamageTimer" to="." method="_on_damage_timer_timeout"]
+[connection signal="timeout" from="SlowTimer" to="." method="_on_slow_timer_timeout"]

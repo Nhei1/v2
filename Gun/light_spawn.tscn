@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://lcu7qhu4morn"]
+
+[ext_resource type="Script" path="res://Gun/light_spawn.gd" id="1_lfuhh"]
+
+[node name="Light_spawn" type="Marker2D"]
+script = ExtResource("1_lfuhh")
+
+[node name="AttackInterval" type="Timer" parent="."]
+wait_time = 0.9
+one_shot = true

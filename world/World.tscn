@@ -1,48 +1,143 @@
-[gd_scene load_steps=8 format=3 uid="uid://bmoudaej1uh03"]
+[gd_scene load_steps=23 format=3 uid="uid://bc3ao1e71i54j"]
 
-[ext_resource type="PackedScene" path="res://camera/Camera2D.tscn" id="2"]
-[ext_resource type="PackedScene" uid="uid://eygwnd6wwxv3" path="res://player/Player.tscn" id="3"]
-[ext_resource type="Texture2D" uid="uid://05krbcxe7xp8" path="res://back/Back.jpg" id="4"]
-[ext_resource type="PackedScene" path="res://spawner.tscn" id="5"]
+[ext_resource type="PackedScene" uid="uid://c3rn7in1w7hw4" path="res://camera/Camera2D.tscn" id="2"]
+[ext_resource type="AudioStream" uid="uid://djcjgr81dsgjc" path="res://music/battle_game.mp3" id="2_wd8af"]
+[ext_resource type="PackedScene" uid="uid://buwrgpxvi5gfe" path="res://player/Player.tscn" id="3"]
+[ext_resource type="Texture2D" uid="uid://li5wad0abmcd" path="res://back/location(version2).png" id="3_ksqra"]
+[ext_resource type="PackedScene" uid="uid://dbmp362cbje4f" path="res://world/spawner.tscn" id="5"]
+[ext_resource type="Script" path="res://world/Interface.gd" id="5_csakd"]
+[ext_resource type="PackedScene" uid="uid://c7qkcbxktl7ef" path="res://Bar_HP/health_bar.tscn" id="5_rff38"]
 [ext_resource type="Script" path="res://world/World.gd" id="6"]
+[ext_resource type="PackedScene" uid="uid://bv3bavrhlhpqe" path="res://enemies/Enemy 4.tscn" id="6_eqjvi"]
+[ext_resource type="PackedScene" uid="uid://cqj8vjrm5qio4" path="res://enemies/Enemy.tscn" id="6_glyom"]
+[ext_resource type="Shader" path="res://world/World.gdshader" id="6_voc3s"]
 [ext_resource type="Script" path="res://world/Label.gd" id="7"]
-[ext_resource type="Texture2D" uid="uid://bqlorlfjqp8s" path="res://icon.png" id="7_v3kjp"]
+[ext_resource type="PackedScene" uid="uid://djbb7kf4kbji0" path="res://enemies/Enemy 2.tscn" id="7_y71s4"]
+[ext_resource type="PackedScene" uid="uid://csd503axg22jk" path="res://enemies/Enemy 3.tscn" id="8_c1kwc"]
+[ext_resource type="FontFile" uid="uid://dxga68xb1yaik" path="res://font/Motrhead Grotesk.ttf" id="9_bokry"]
+[ext_resource type="PackedScene" uid="uid://cvt70qurwcnnt" path="res://enemies/Enemy 5.tscn" id="10_cb5s3"]
+[ext_resource type="Script" path="res://world/GameTimerLabel.gd" id="10_mqqnk"]
+[ext_resource type="PackedScene" uid="uid://cd2fod5r0nxki" path="res://xp/XpProgressBar.tscn" id="11_3ss15"]
+[ext_resource type="Script" path="res://world/EnemyInfo.gd" id="14_g2cho"]
+[ext_resource type="PackedScene" uid="uid://dcqfp5xndp2gg" path="res://gold.tscn" id="16_j4snj"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_of7pn"]
+shader = ExtResource("6_voc3s")
+shader_parameter/projector_power = 0.308
+shader_parameter/vignette_param = 3.729
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_25uhp"]
+resource_local_to_scene = true
 
 [node name="World" type="Node"]
 script = ExtResource("6")
 
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+process_mode = 3
+stream = ExtResource("2_wd8af")
+autoplay = true
+parameters/looping = true
+
 [node name="Camera2D" parent="." instance=ExtResource("2")]
 position = Vector2(0, 0)
+zoom = Vector2(0.5, 0.5)
 process_callback = 0
 position_smoothing_speed = 0.0
+drag_left_margin = 0.0
+drag_top_margin = 0.0
+drag_right_margin = 0.0
+drag_bottom_margin = 0.0
 
 [node name="Background" type="Sprite2D" parent="."]
-position = Vector2(514, 300)
-texture = ExtResource("4")
-
-[node name="Player" parent="." instance=ExtResource("3")]
+z_index = -1
+position = Vector2(376, 144)
+texture = ExtResource("3_ksqra")
 
 [node name="spawner" parent="." instance=ExtResource("5")]
+enemies = Array[PackedScene]([ExtResource("6_glyom"), ExtResource("7_y71s4"), ExtResource("8_c1kwc"), ExtResource("6_eqjvi"), ExtResource("10_cb5s3")])
 
 [node name="UI" type="CanvasLayer" parent="."]
+process_mode = 2
 
-[node name="Icon" type="Sprite2D" parent="UI"]
-position = Vector2(532, 392)
-scale = Vector2(0.375, 0.25)
-texture = ExtResource("7_v3kjp")
-
-[node name="Interface" type="Control" parent="UI"]
-layout_mode = 3
+[node name="ColorRect" type="ColorRect" parent="UI"]
+material = SubResource("ShaderMaterial_of7pn")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="Interface" type="Control" parent="UI"]
+material = SubResource("ShaderMaterial_25uhp")
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_csakd")
+
+[node name="HealthBar" parent="UI/Interface" instance=ExtResource("5_rff38")]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.483333
+anchor_top = 0.57037
+anchor_right = 0.483333
+anchor_bottom = 0.57037
+offset_left = -18.0
+offset_top = 54.0
+offset_right = -18.0
+offset_bottom = 54.0
+scale = Vector2(1.5, 1.5)
+metadata/_edit_use_anchors_ = true
+
+[node name="Control" parent="UI/Interface" instance=ExtResource("11_3ss15")]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_right = 0.0
+grow_horizontal = 1
+grow_vertical = 0
+
 [node name="Label" type="Label" parent="UI/Interface"]
 layout_mode = 0
 offset_left = 22.0
 offset_top = 20.0
-offset_right = 62.0
-offset_bottom = 34.0
+offset_right = 128.0
+offset_bottom = 88.0
+theme_override_fonts/font = ExtResource("9_bokry")
+theme_override_font_sizes/font_size = 48
 script = ExtResource("7")
+
+[node name="GameTimerLabel" type="Label" parent="UI/Interface"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 23.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("9_bokry")
+theme_override_font_sizes/font_size = 80
+script = ExtResource("10_mqqnk")
+
+[node name="EnemyInfo" type="Label" parent="UI/Interface"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 248.0
+offset_right = 152.0
+offset_bottom = 368.0
+theme_override_fonts/font = ExtResource("9_bokry")
+theme_override_font_sizes/font_size = 34
+script = ExtResource("14_g2cho")
+
+[node name="TextureRect" parent="UI/Interface" instance=ExtResource("16_j4snj")]
+layout_mode = 1
+offset_left = -376.0
+offset_top = 64.0
+offset_right = -208.0
+offset_bottom = 136.0
+
+[node name="Player" parent="." instance=ExtResource("3")]
+position = Vector2(576, 320)

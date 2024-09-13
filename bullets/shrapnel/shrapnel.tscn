@@ -1,0 +1,39 @@
+[gd_scene load_steps=7 format=3 uid="uid://b57adk4rbiinv"]
+
+[ext_resource type="Script" path="res://bullets/shrapnel/shrapnel.gd" id="1_cqct3"]
+[ext_resource type="Shader" path="res://bullets/knive.gdshader" id="1_j8yfx"]
+[ext_resource type="Texture2D" uid="uid://dswbd45moda6l" path="res://1663950806_57-top-fon-com-p-serii-shum-fon-foto-116.png" id="2_up6u7"]
+[ext_resource type="Texture2D" uid="uid://dlx7v0a78ysk8" path="res://bullets/sprites/faerball.png" id="3_aeu6w"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ajvao"]
+shader = ExtResource("1_j8yfx")
+shader_parameter/gradientRemap = Vector4(1, 1, 0.177, -0.013)
+shader_parameter/beamRemap = Vector4(1.244, 1.256, -0.201, 0.149)
+shader_parameter/color1 = null
+shader_parameter/color2 = Color(0, 0, 0, 1)
+shader_parameter/scale = Vector3(1, 1, 0)
+shader_parameter/threshold = 0.993
+shader_parameter/offset = 1.5
+shader_parameter/noise = ExtResource("2_up6u7")
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_183co"]
+radius = 8.0
+
+[node name="Area2D" type="Area2D" groups=["bullet"]]
+z_index = 1
+script = ExtResource("1_cqct3")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_ajvao")
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("3_aeu6w")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_183co")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.7
+autostart = true
+
+[connection signal="body_entered" from="." to="." method="_on_Bullet_body_entered"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

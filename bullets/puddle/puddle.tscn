@@ -1,0 +1,48 @@
+[gd_scene load_steps=7 format=3 uid="uid://dqybw47wywxy7"]
+
+[ext_resource type="Script" path="res://bullets/puddle/puddle.gd" id="1_0x1s5"]
+[ext_resource type="Shader" path="res://bullets/knive.gdshader" id="2_omrkh"]
+[ext_resource type="Texture2D" uid="uid://dswbd45moda6l" path="res://1663950806_57-top-fon-com-p-serii-shum-fon-foto-116.png" id="3_jwgpw"]
+[ext_resource type="Texture2D" uid="uid://dlx7v0a78ysk8" path="res://bullets/sprites/faerball.png" id="4_gisn4"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ajvao"]
+shader = ExtResource("2_omrkh")
+shader_parameter/gradientRemap = Vector4(3.259, 3.432, -0.059, -0.946)
+shader_parameter/beamRemap = Vector4(1.244, 1.256, -0.201, 0.149)
+shader_parameter/color1 = null
+shader_parameter/color2 = Color(0.486275, 1, 0.152941, 1)
+shader_parameter/scale = Vector3(1, 1.021, 0)
+shader_parameter/threshold = 0.727
+shader_parameter/offset = 1.5
+shader_parameter/noise = ExtResource("3_jwgpw")
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_x7d55"]
+radius = 8.0
+height = 64.0
+
+[node name="puddle" type="Area2D" groups=["bullet", "noArmor"]]
+script = ExtResource("1_0x1s5")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+visibility_layer = 8
+material = SubResource("ShaderMaterial_ajvao")
+position = Vector2(8.25958e-07, 0.0130455)
+rotation = 1.5708
+scale = Vector2(1, 3.634)
+texture = ExtResource("4_gisn4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+rotation = 1.5708
+scale = Vector2(1.9, 1.729)
+shape = SubResource("CapsuleShape2D_x7d55")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 5.0
+autostart = true
+
+[node name="Timer2" type="Timer" parent="."]
+wait_time = 0.15
+autostart = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
+[connection signal="timeout" from="Timer2" to="." method="_on_timer_2_timeout"]

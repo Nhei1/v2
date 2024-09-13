@@ -1,0 +1,110 @@
+[gd_scene load_steps=8 format=3 uid="uid://cf1hchwqtsh5h"]
+
+[ext_resource type="Script" path="res://win_Screen/win_screen.gd" id="1_hrj53"]
+[ext_resource type="Shader" path="res://world/World.gdshader" id="2_pcqgi"]
+[ext_resource type="FontFile" uid="uid://ddwxwtqogbx83" path="res://font/Zaychik-Regular.ttf" id="3_rj5ip"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vx34d"]
+shader = ExtResource("2_pcqgi")
+shader_parameter/projector_power = 0.5
+shader_parameter/vignette_param = 10.0
+
+[sub_resource type="Animation" id="Animation_8d0nf"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ColorRect:material:shader_parameter/vignette_param")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [10.0]
+}
+
+[sub_resource type="Animation" id="Animation_mom3d"]
+resource_name = "die"
+length = 10.0
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ColorRect")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(),
+"transitions": PackedFloat32Array(),
+"values": []
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ColorRect:material:shader_parameter/vignette_param")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 10),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [8.0, 1.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_m3iaf"]
+_data = {
+"RESET": SubResource("Animation_8d0nf"),
+"die": SubResource("Animation_mom3d")
+}
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hrj53")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_vx34d")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -100.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.95, 0.6175, 0, 1)
+theme_override_fonts/font = ExtResource("3_rj5ip")
+theme_override_font_sizes/font_size = 200
+text = "WIN!!!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_m3iaf")
+}
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -128.0
+offset_bottom = 128.0
+grow_horizontal = 0
+text = "Exit"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
